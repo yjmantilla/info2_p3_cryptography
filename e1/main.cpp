@@ -43,33 +43,65 @@ salida por consola.
 
 #define buffer_size 8
 #define line std::cout<<std::endl;
-#define seed 4
 std::bitset<8> binary(char);
 char notbin(char );
 int main(){
+
+
+    char filein[100];
+    char fileb[100];
+    char filec[100];
+
+    std::cout<<"Enter name of file to encrypt: "<<std::endl;
+    //std::cin>>filein;
+
+    std::cout<<"Enter name of binary conversion file: "<<std::endl;
+    //std::cin>>fileb;
+
+    std::cout<<"Enter name of encryption file: "<<std::endl;
+    //std::cin>>filec;
+
+    line
+            /*Program Parameters*/
+            int cipher=0;
+            int seed=0;
+            while(cipher!=1 && cipher!=2)
+            {
+            std::cout<<"Enter method to encrypt file (either 1 or 2): "<<std::endl;
+            std::cin>>cipher;
+            }
+
+            while (seed < 4)
+            {
+                std::cout<<"Enter seed of the encryption (integer equal or greater than 4): "<<std::endl;
+                std::cin>>seed;
+            }
+    line
+
     char * buffer;
-    buffer = new char [buffer_size];
-    std::cout<<sizeof(*buffer)<<" "<<0%2;
+    buffer = new char [seed];
+
     std::fstream ofsc("C:/Users/admin/Desktop/practica_3/e1/cypher.bin",std::fstream::binary|std::ifstream::out);
     std::fstream ofsb("C:/Users/admin/Desktop/practica_3/e1/data.bin",std::fstream::binary|std::ifstream::out|std::ifstream::in);
-    std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/data.txt",std::ifstream::in);
+    std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/data2.txt",std::ifstream::in);
 
-
+    std::cout<<ifs.good();
     //converting the ifs to binary in ofsb
 
     ifs.seekg(0,ifs.end);
     int lenght=ifs.tellg();
     ifs.seekg(0,ifs.beg);
 
+    /*Convert File To Binary*/
 
     while(ifs.good())
         {
         int carryg=ifs.tellg();
-        if(carryg+buffer_size<lenght)
+        if(carryg+seed<lenght)
         {
-            ifs.read(buffer,buffer_size);
+            ifs.read(buffer,seed);
             line
-            for(int i=0;i<buffer_size;i++)
+            for(int i=0;i<seed;i++)
                 {
                 ofsb<<binary(buffer[i]);
                 }
@@ -88,7 +120,8 @@ int main(){
 
     ifs.close();
 
-    //encrypting phase
+    /*Encrypting Phase*/
+
     ofsb.seekg(0,ofsb.end);
     int lenghtb=ofsb.tellg();
     ofsb.seekg(0,ofsb.beg);
@@ -96,7 +129,7 @@ int main(){
     char * bufferb;
     int way=0;
     bufferb=new char[seed];
-    int cipher=2;
+
     while(ofsb.good()&&ofsc.good())
     {
         int carrybg=ofsb.tellg();
@@ -108,7 +141,7 @@ int main(){
 
         if (cipher==1)
         {
-            if(way==0)//first block too since case is initialized in
+            if(way==0)//first block too since way is initialized in 0
             {
                 for(int i=0;i<howMany;i++)
                 {
@@ -137,7 +170,7 @@ int main(){
 
             int z=0;
             int o=0;
-            for(int i=0;i<seed;i++)
+            for(int i=0;i<howMany;i++)
             {
                 if (bufferb[i]=='0'){z++;}
                 if (bufferb[i]=='1'){o++;}
