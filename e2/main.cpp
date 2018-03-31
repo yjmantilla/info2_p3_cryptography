@@ -154,6 +154,7 @@ int main(){
 
     ifs.close();
     ofs.close();
+    text.close();
     return 0;
 }
 

@@ -81,9 +81,9 @@ int main(){
     char * buffer;
     buffer = new char [seed];
 
-    std::fstream ofsc("C:/Users/admin/Desktop/practica_3/e1/cypher.bin",std::fstream::binary|std::ifstream::out);
-    std::fstream ofsb("C:/Users/admin/Desktop/practica_3/e1/data.bin",std::fstream::binary|std::ifstream::out|std::ifstream::in);
-    std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/data2.txt",std::ifstream::in);
+    std::fstream ofsc("C:/Users/admin/Desktop/practica_3/e1/cypher.bin",std::fstream::binary|std::ifstream::out| std::fstream::trunc);
+    std::fstream ofsb("C:/Users/admin/Desktop/practica_3/e1/data.bin",std::fstream::binary|std::ifstream::out|std::ifstream::in| std::fstream::trunc);
+    std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/data.txt",std::ifstream::in);
 
     std::cout<<ifs.good();
     //converting the ifs to binary in ofsb
