@@ -39,12 +39,15 @@ salida por consola.
 #include <fstream>
 #include <iostream>
 #include <exception>
-#include <bitset>
+//#include <bitset>
 
 #define buffer_size 8
 #define line std::cout<<std::endl;
-std::bitset<8> binary(char);
+//std::bitset<8> binary(char);
 char notbin(char );
+void toBinary(char ,char * ,int );
+int pow(int ,int );
+
 int main(){
 
 
@@ -93,17 +96,21 @@ int main(){
     ifs.seekg(0,ifs.beg);
 
     /*Convert File To Binary*/
+    char bin[8];
 
     while(ifs.good())
         {
         int carryg=ifs.tellg();
+
         if(carryg+seed<lenght)
         {
             ifs.read(buffer,seed);
             line
             for(int i=0;i<seed;i++)
                 {
-                ofsb<<binary(buffer[i]);
+                //ofsb<<binary(buffer[i]);
+                toBinary(buffer[i], bin, 8);
+                ofsb.write(bin,8);
                 }
         }
         else
@@ -112,7 +119,9 @@ int main(){
             line
             for(int i=0;i<lenght-carryg;i++)
                 {
-                ofsb<<binary(buffer[i]);
+                //ofsb<<binary(buffer[i]);
+                toBinary(buffer[i], bin, 8);
+                ofsb.write(bin,8);
                 }
             break;
             }
@@ -197,11 +206,11 @@ int main(){
 	return 0;			
 }
 
-std::bitset<8> binary(char c)
-{
-    std::bitset<8> x(c);
-    return x;
-}
+//std::bitset<8> binary(char c)
+//{
+//    std::bitset<8> x(c);
+//    return x;
+//}
 
 char notbin(char c)
 {
@@ -211,3 +220,31 @@ char notbin(char c)
 
     return xnot;
 }
+
+void toBinary(char c,char * bin,int n)
+{
+    int x = (int) c;
+    int y;
+
+    for(int i=n-1;i>=0;i--)
+    {
+        y = x/(pow(2,i));
+        bin[n-1-i] = y + 48;
+        x = x - pow(2,i)*y;
+        //cout<<i<<" "<<x<<" "<<y<<" "<<bin[n-1-i]<<endl;
+    }
+}
+
+int pow(int a,int b)
+    {
+        int potencia=a;
+        if (b==0){return 1;}
+        else
+        {
+        for(int i=1;i<b;i++)
+            {
+                    potencia=potencia*a;
+            }
+        return potencia;
+        }
+    }

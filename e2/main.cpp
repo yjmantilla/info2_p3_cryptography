@@ -11,7 +11,7 @@ de entrada y salida.
 
 #define buffer_size 8
 #define line std::cout<<std::endl;
-std::bitset<8> binary(char);
+//std::bitset<8> binary(char);
 char notbin(char );
 int pow(int ,int);
 int main(){
@@ -44,7 +44,7 @@ int main(){
             }
     line
 
-    std::fstream ofs("C:/Users/admin/Desktop/practica_3/e2/cypher.ban",std::ifstream::out|std::ifstream::in| std::fstream::trunc);
+    std::fstream ofs("C:/Users/admin/Desktop/practica_3/e2/data.bin",std::ifstream::out|std::ifstream::in| std::fstream::trunc);
     std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/cypher.bin",std::ifstream::in);
     std::fstream text("C:/Users/admin/Desktop/practica_3/e2/text.txt",std::ifstream::out);
     line
@@ -101,9 +101,9 @@ int main(){
 
                 }
             }
-            line
+            //line
             //std::cout<<ofs.good()<<" "<<ofs.tellp()<<ofs.tellg();
-            line
+            //line
             ofs.seekg(-4,ofs.cur);//this was the problem, everytime we did ofs<< the carry moved
             ofs.read(buffer2,howMany);
 
@@ -140,13 +140,13 @@ int main(){
         {
             x=((int) (buffet[i]-48))*pow(2,7-i)+x;
 
-            line
+            //line
         }
-        std::cout<<x;
+        //std::cout<<x;
 
         text<<(char) x;
-        line
-        std::cout<<ofs.eof();line
+        //line
+        //std::cout<<ofs.eof();line
         ofs.read(buffet,8);
         if(ofs.eof()){break;}
 
@@ -158,11 +158,11 @@ int main(){
     return 0;
 }
 
-std::bitset<8> binary(char c)
-{
-    std::bitset<8> x(c);
-    return x;
-}
+//std::bitset<8> binary(char c)
+//{
+//    std::bitset<8> x(c);
+//    return x;
+//}
 
 char notbin(char c)
 {
