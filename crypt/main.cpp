@@ -1,11 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <exception>
-//#include <QDebug>
-//#include <QTextStream>
-//#include <QFile>
-//#include <QtSerialPort/QSerialPort>
-//#include <QtSerialPort/QSerialPortInfo>
+#include <QDebug>
+#include <QTextStream>
+#include <QFile>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include "crypto.h"
 
 #define line std::cout<<std::endl;
@@ -16,6 +16,7 @@ int decrypt();
 int compare();
 int sync();
 int async();
+void port_cfg(QSerialPort * serial, char * port);
 
 int main()
 {
@@ -287,54 +288,12 @@ int compare()
 
 int sync()
 {
-//    /*Configuracion del puerto*/
+    /*Configuracion del puerto*/
+    char port[100];
 
-//    try
-//    {
+    QSerialPort serial;
+    port_cfg(&serial,port);
 
-//        char port[100];
-
-//        std::cout<<"\nIngrese nombre del puerto:\n";
-//        std::cin<<port;
-//        line
-
-//        QSerialPort serial;
-//        serial.setPortName(port);
-
-//        if(serial.open(QIODevice::ReadWrite)){
-//            if(!serial.setBaudRate(QSerialPort::Baud9600))
-//            {qDebug()<<serial.errorString();throw '1';}
-
-//            if(!serial.setDataBits(QSerialPort::Data8))
-//            {qDebug()<<serial.errorString();throw '2';}
-
-//            if(!serial.setParity(QSerialPort::NoParity))
-//            {qDebug()<<serial.errorString();throw '3';}
-
-//            if(!serial.setStopBits(QSerialPort::OneStop))
-//            {qDebug()<<serial.errorString();throw '4';}
-
-//            if(!serial.setFlowControl(QSerialPort::NoFlowControl))
-//            {qDebug()<<serial.errorString();throw '5';}
-//        }
-//        else {throw '0';}
-
-//    }
-
-//    /*Excepciones*/
-//        catch (char c){
-//                std::cout<<"Error # "<<c<<": ";
-//                if(c=='0'){std::cout<<"Error al abrir puerto.\n";}
-//                if(c=='1'){std::cout<<"Error al configurar baudios.\n";}
-//                if(c=='2'){std::cout<<"Error al configurar cantidad data bits.\n";}
-//                if(c=='3'){std::cout<<"Error al configurar paridad del puerto.\n";}
-//                if(c=='4'){std::cout<<"Error al configurar bits de stop.\n";}
-//                if(c=='5'){std::cout<<"Error al configurar flow control.\n";}
-//                }
-
-//        catch(...){ //cualquier otra excepcion
-//            std::cout << "Error desconocido." <<std::endl;
-//        }
 
 //    /*Configuracion del mensaje*/
 //    int length = 0;
@@ -354,3 +313,57 @@ int sync()
 
 int async()
 {return 0;}
+
+void port_cfg(QSerialPort * serial, char * port)
+{
+    /*Configuracion del puerto*/
+
+    try
+    {
+
+        std::cout<<"\nIngrese nombre del puerto:\n";
+        std::cin>>port;
+        line
+
+        serial->setPortName(port);
+
+        if(!serial->open(QIODevice::ReadWrite)) {throw '0';}
+
+        if(serial->open(QIODevice::ReadWrite)) {
+
+
+            if(!serial->setBaudRate(QSerialPort::Baud9600))
+            {qDebug()<<serial->errorString();throw '1';}
+
+            if(!serial->setDataBits(QSerialPort::Data8))
+            {qDebug()<<serial->errorString();throw '2';}
+
+            if(!serial->setParity(QSerialPort::NoParity))
+            {qDebug()<<serial->errorString();throw '3';}
+
+            if(!serial->setStopBits(QSerialPort::OneStop))
+            {qDebug()<<serial->errorString();throw '4';}
+
+            if(!serial->setFlowControl(QSerialPort::NoFlowControl))
+            {qDebug()<<serial->errorString();throw '5';}
+        }
+
+
+    }
+
+    /*Excepciones*/
+        catch (char c){
+                std::cout<<"Error # "<<c<<": ";
+                if(c=='0'){std::cout<<"Error al abrir puerto.\n";}
+                if(c=='1'){std::cout<<"Error al configurar baudios.\n";}
+                if(c=='2'){std::cout<<"Error al configurar cantidad data bits.\n";}
+                if(c=='3'){std::cout<<"Error al configurar paridad del puerto.\n";}
+                if(c=='4'){std::cout<<"Error al configurar bits de stop.\n";}
+                if(c=='5'){std::cout<<"Error al configurar flow control.\n";}
+                }
+
+        catch(...){ //cualquier otra excepcion
+            std::cout << "Error desconocido." <<std::endl;
+        }
+
+}

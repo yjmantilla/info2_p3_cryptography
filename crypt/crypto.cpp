@@ -87,6 +87,7 @@ int x=0;
 return (char) x;
 }
 
+/*simplemente imprime un string*/
 void printstr(char * str,int n)
 {
     for(int i=0;i<n;i++)
@@ -95,6 +96,7 @@ void printstr(char * str,int n)
     }
 }
 
+/*procedimiento que pide al usuario el metodo y la semilla por referencia*/
 void encrypt_cfg(int &method, int &seed)
 {
     line
@@ -120,7 +122,7 @@ void encrypt_cfg(int &method, int &seed)
     line
 }
 
-/*Convierte el stream ifs en su representacion binaria en el stream ofsb*/
+/*Convierte el stream ifs (texto) en su representacion binaria en el stream ofsb (binario)*/
 
 void textToBinary (std::fstream * ifs, std::fstream * ofsb)
 {
@@ -168,6 +170,7 @@ void textToBinary (std::fstream * ifs, std::fstream * ofsb)
 
 }
 
+/*encripta el stream ofsb (binario) en el stream ofsc (binario) segun el seed y el metodo*/
 void encrypt(std::fstream * ofsb, std::fstream * ofsc, int seed, int method)
 {
     /*Fase de Encriptacion*/
@@ -282,6 +285,7 @@ void encrypt(std::fstream * ofsb, std::fstream * ofsc, int seed, int method)
 
 }
 
+/*desencripta el stream ifs (binario) en el stream mfs (binario) segun el seed y el metodo*/
 void decrypt(std::fstream *ifs, std::fstream * mfs, int seed , int method)
 {
     try
@@ -406,6 +410,9 @@ void decrypt(std::fstream *ifs, std::fstream * mfs, int seed , int method)
         }
 
 }
+
+/*Convierte el stream ifs (binario) en su representacion textual en el stream ofsb (texto)*/
+
 
 void binaryToText(std::fstream * mfs, std::fstream * text)
 {
