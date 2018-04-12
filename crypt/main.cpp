@@ -17,6 +17,8 @@ int compare();
 int sync();
 int async();
 void port_cfg(QSerialPort * serial, char * port);
+int toBinary();
+int toText();
 
 int main()
 {
@@ -26,7 +28,7 @@ int main()
         while(1)
         {
             line
-            std::cout<<"Que desea hacer? (Seleccione 0,1,2,3,4,5)";
+            std::cout<<"Que desea hacer? (Seleccione 0,1,2,3,4,5,6,7)";
             line line
             std::cout<<"0.Salir\n";
             std::cout<<"1.Encriptar\n";
@@ -34,10 +36,12 @@ int main()
             std::cout<<"3.Comparar\n";
             std::cout<<"4.Sincrona\n";
             std::cout<<"5.Asincrona\n";
+            std::cout<<"6.Convertir a Binario\n";
+            std::cout<<"7.Convertir a Texto\n";
             line line
             std::cin>>opc;
             line
-            if(opc==0||opc==1||opc==2||opc==3||opc==4||opc==5){break;}
+            if(opc==0||opc==1||opc==2||opc==3||opc==4||opc==5||opc==6||opc==7){break;}
         }
 
         switch (opc)
@@ -48,6 +52,8 @@ int main()
         case 3 :{compare();break;}
         case 4 :{sync();break;}
         case 5 :{async();break;}
+        case 6 :{toBinary();break;}
+        case 7 :{toText();break;}
         }
     }
     return 0;
@@ -110,7 +116,7 @@ try{
         ifs.close();//cerramos el stream de entrada
 
    /*Fase de encriptacion*/
-        crypto_h::encrypt(&ofsb, &ofsc,seed,method);
+        crypto::encrypt(&ofsb, &ofsc,seed,method);
 
         ofsb.close();
         ofsc.close();
@@ -189,10 +195,10 @@ try{
     if(!text.good()){throw '3';}
 
     /*Fase de decodificacion*/
-    crypto_h::decrypt(&ifs,&mfs,seed,method);
+    crypto::decrypt(&ifs,&mfs,seed,method);
 
     /*Conversion de binario a texto*/
-    crypto_h::binaryToText(&mfs,&text);
+    crypto::binaryToText(&mfs,&text);
 
     /*Cerramos los archivos*/
     ifs.close();
@@ -294,25 +300,95 @@ int sync()
     QSerialPort serial;
     port_cfg(&serial,port);
 
+    /*Configuracion del mensaje*/
+    int length=0; //tamanyo del bloque de lectura maximo
+    line
+    std::cout<<"Ingrese el tamanyo maximo del bloque de lectura:\n";
+    std::cin>>length;
+    line
 
-//    /*Configuracion del mensaje*/
-//    int length = 0;
-//    std::cout<<"Introduzca tamanyo maximo de la cadena:\n";
-//    std::cin<<length;
+    char * message;
+    message = new char[length+1];
 
-//    char * msg; //donde guardara
+    /*Archivo donde se va a guardar*/
+    char file[100];
+    line
+    std::cout<<"Ingrese el nombre del archivo donde se guardara los datos enviados por el arduino:\n";
+    std::cin>>file;
+    line
 
-//    /*Comienzo de la transmision*/
+    //arduino file stream
+    std::fstream afs(file,std::ifstream::out| std::fstream::trunc);
 
-//    serial.write("b\n"); //enviamos caracter al arduino para empezarla
 
+    /*Comienzo de la transmision*/
 
+    serial.write("\n"); //enviamos caracter al arduino para empezarla
+    int howMany=0; //how many did we read
+
+    if(serial.waitForReadyRead(100)){
+                //Data was returned
+                 howMany= serial.readLine(message,length+1); //Leer toda la línea que envía arduino, +1 porque al final agrega \0 automaticamente
+                qDebug()<<"Response: "<<message;
+
+                /*Guardamos en el archivo*/
+                afs.write(message,howMany);
+
+            }else{
+                //No data
+                qDebug()<<"Time out";
+            }
+
+    afs.close();
+    serial.close();
 
     return 0;
 }
 
 int async()
-{return 0;}
+{
+    /*Configuracion del puerto*/
+    char port[100];
+
+    QSerialPort serial;
+    port_cfg(&serial,port);
+
+    int read=1;
+    char data;
+
+    /*Archivo donde se va a guardar*/
+    char file[100];
+    line
+    std::cout<<"Ingrese el nombre del archivo donde se guardara los datos enviados por el arduino:\n";
+    std::cin>>file;
+    line
+
+    //arduino file stream
+    std::fstream afs(file,std::ifstream::out| std::fstream::trunc);
+
+    while(read)
+    {
+        if(serial.waitForReadyRead(150))
+        {
+            //data was returned
+            serial.read(&data,1);
+            qDebug()<<"Response: "<<data;
+            if(data == '\n') {read = 0;}
+            afs.put(data);
+
+        }
+        else{
+                        //No data
+                        qDebug()<<"Time out";
+                    }
+    }
+
+    serial.close();
+    afs.close();
+
+    return 0;
+
+}
 
 void port_cfg(QSerialPort * serial, char * port)
 {
@@ -366,4 +442,115 @@ void port_cfg(QSerialPort * serial, char * port)
             std::cout << "Error desconocido." <<std::endl;
         }
 
+}
+
+int toBinary()
+{
+    /*Nombre de los archivos*/
+
+    /*Ingresado por el usuario*/
+
+    char file_txt[100]; //archivo de entrada de texto
+    char file_bin[100];//archivo de salida que aloja el texto en su representacion binaria
+
+    std::cout<<"Ingrese el nombre del archivo de texto: "<<std::endl;
+    std::cin>>file_txt;
+
+    line line
+
+    std::cout<<"Ingrese el nombre del archivo en binario: "<<std::endl;
+    std::cin>>file_bin;
+
+    try{
+
+        //definicion de los streams
+
+        //stream de entrada para el archivo de texto original (file text stream)
+        std::fstream fts(file_txt,std::ifstream::in);
+        if(!fts.good()){throw '1';}
+        //stream de entrada y salida para el archivo de texto en su representacion binaria (file binary stream)
+        std::fstream fbs(file_bin,std::ifstream::out|std::ifstream::in| std::fstream::trunc);
+        if(!fbs.good()){throw '2';}
+
+        /*Conversion del archivo de entrada a su representacion binaria*/
+            textToBinary(&fts,&fbs);
+
+            fts.close();
+            fbs.close();
+
+            line
+            std::cout<<"Archivo convertido a binario exitosamente!";
+            line
+
+        }
+
+    /*Excepciones*/
+        catch (char c){
+                std::cout<<"Error # "<<c<<": ";
+                if(c=='1'){std::cout<<"Error al abrir el archivo de texto.\n";}
+                if(c=='2'){std::cout<<"Error al generar archivo en binario\n";}
+                }
+
+        catch(...){ //cualquier otra excepcion
+            std::cout << "Error desconocido." <<std::endl;
+        }
+
+    return 0;
+}
+
+int toText()
+{
+    /*Nombre de los archivos*/
+
+    /*Ingresado por el usuario*/
+
+    char file_txt[100]; //archivo de salida de texto
+    char file_bin[100];//archivo de entrada que aloja el texto en su representacion binaria
+
+
+    std::cout<<"Ingrese el nombre del archivo en binario: "<<std::endl;
+    std::cin>>file_bin;
+
+    line line
+
+
+    std::cout<<"Ingrese el nombre del archivo de texto: "<<std::endl;
+    std::cin>>file_txt;
+
+
+    try{
+
+        //definicion de los streams
+
+        //stream de entrada para el archivo de texto original (file text stream)
+        std::fstream fbs(file_bin,std::ifstream::in);
+        if(!fbs.good()){throw '1';}
+        //stream de entrada y salida para el archivo de texto en su representacion binaria (file binary stream)
+        std::fstream fts(file_txt,std::ifstream::out|std::ifstream::in| std::fstream::trunc);
+        if(!fts.good()){throw '2';}
+
+        /*Conversion del archivo de entrada a su representacion binaria*/
+            binaryToText(&fbs,&fts);
+
+            fts.close();
+            fbs.close();
+
+            line
+            std::cout<<"Archivo convertido a texto exitosamente!";
+            line
+
+        }
+
+    /*Excepciones*/
+        catch (char c){
+                std::cout<<"Error # "<<c<<": ";
+                if(c=='1'){std::cout<<"Error al abrir el archivo en binario.\n";}
+                if(c=='2'){std::cout<<"Error al generar archivo de texto\n";}
+                }
+
+        catch(...){ //cualquier otra excepcion
+            std::cout << "Error desconocido." <<std::endl;
+        }
+
+    return 0;
 }

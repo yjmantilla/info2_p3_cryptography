@@ -1,5 +1,5 @@
-#ifndef crypto_h
-#define crypto_h
+#ifndef crypto
+#define crypto
 
 #include <iostream>
 #include <fstream>
