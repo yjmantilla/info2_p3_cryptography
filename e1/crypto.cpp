@@ -68,3 +68,19 @@ std::bitset<8> binary(char c)
 }
 */
 
+/*Funcion que convierte un numero binario de n bits en un caracter*/
+
+char binaryToChar(int n, char * string)
+{
+int x=0;
+
+    for(int i=0;i<n;i++)
+    {
+        x=((int) (string[i]-48))*pow(2,n-1-i)+x;
+
+        //std::cout<<x;
+        //line
+    }
+
+return (char) x;
+}

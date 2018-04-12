@@ -7,182 +7,221 @@ de entrada y salida.
 #include <fstream>
 #include <iostream>
 #include <exception>
-#include <bitset>
+#include "C:\Users\admin\Desktop\practica_3\e1\crypto.h"
 
-#define buffer_size 8
 #define line std::cout<<std::endl;
-//std::bitset<8> binary(char);
-char notbin(char );
-int pow(int ,int);
+
 int main(){
 
+    /*Nombres de los archivos a trabajar*/
 
-    //char filein[100];
-    //char fileout[100];
+        /*Ingresado por el usuario*/
+        /*
+        char filein[100];
+        char fileout[100];
 
-    std::cout<<"Enter name of binary file to decrypt: "<<std::endl;
-    //std::cin>>filein;
-    //char[] filein="C:/Users/admin/Desktop/practica_3/e2/cypher.bin";
-    std::cout<<"Enter name of de-encrypted file: "<<std::endl;
-    //std::cin>>fileout;
-    //char[] fileout="C:/Users/admin/Desktop/practica_3/e2/cypher.ban";
+        std::cout<<"Ingrese el nombre del archivo binario a decodificar: "<<std::endl;
+        std::cin>>filein;
+
+        std::cout<<"Ingrese el nombre del archivo de texto decodificado: "<<std::endl;
+        std::cin>>fileout;
+        */
+
+        /*Para debug*/
+        char filein[]="C:/Users/admin/Desktop/practica_3/e1/cypher.bin";
+        char fileout[]="C:/Users/admin/Desktop/practica_3/e2/text.txt";
+
+        /*Archivo intermedio que aloja el archivo en binario decodificado, se borrara al final*/
+        char filebin[]="data.bin";
 
     line
-            /*Program Parameters*/
-            int cipher=0;
+        /*Parametros del Programa*/
+            int method=0;
             int seed=0;
-            while(cipher!=1 && cipher!=2)
+
+            while(method!=1 && method!=2)
             {
-            std::cout<<"Enter method to encrypt file (either 1 or 2): "<<std::endl;
-            std::cin>>cipher;
+            std::cout<<"Ingrese el metodo de encriptacion (1 o 2): "<<std::endl;
+            std::cin>>method;
             }
 
-            while (seed < 4)
+            while (seed < 3)
             {
-                std::cout<<"Enter seed of the encryption (integer equal or greater than 4): "<<std::endl;
+                std::cout<<"Ingrese semilla de encriptacion (mayor o igual a 3): "<<std::endl;
                 std::cin>>seed;
             }
     line
 
-    std::fstream ofs("C:/Users/admin/Desktop/practica_3/e2/data.bin",std::ifstream::out|std::ifstream::in| std::fstream::trunc);
-    std::fstream ifs("C:/Users/admin/Desktop/practica_3/e1/cypher.bin",std::ifstream::in);
-    std::fstream text("C:/Users/admin/Desktop/practica_3/e2/text.txt",std::ifstream::out);
-    line
-    std::cout<<"Input file succesful: "<<ifs.good();
-    line
-    std::cout<<"Output file succesful: "<<ofs.good();
-    line
-    /*Encrypting Phase*/
+try{
+    /*Creacion de los streams para los archivos*/
 
+    //input file stream
+    std::fstream ifs(filein,std::ifstream::in);
+    if(!ifs.good()){throw '1';}
+
+    //mid file stream
+    std::fstream mfs(filebin,std::ifstream::out|std::ifstream::in| std::fstream::trunc);
+    if(!mfs.good()){throw '2';}
+
+    //text file stream
+    std::fstream text(fileout,std::ifstream::out);
+    if(!text.good()){throw '3';}
+
+    /*Fase de decodificacion*/
+
+    //obtenemos tamanyo del archivo de entrada
     ifs.seekg(0,ifs.end);
     int length=ifs.tellg();
     ifs.seekg(0,ifs.beg);
 
-    char * buffer;
-    char * buffer2;
-    int way=0;
+
+    char * buffer; //para el archivo de entrada binario codificado
+    char * buffer2;//para el archivo intermedio binario descodificado
     buffer=new char[seed];
     buffer2=new char[seed];
-    while(ifs.good()&&ofs.good())
+
+    int rule=0;//Inicializamos en cero ya que el primer bloque en el metodo 1 aplica esa regla
+    int cursor;
+    int howMany;
+    int last=0;
+
+    while(ifs.good()&&mfs.good())
 
     {
-        int carry=ifs.tellg();
-        int howMany;
-        if(carry+seed<=length){howMany=seed;}
-            else{howMany=length-carry;}
+        cursor=ifs.tellg();
+
+        //detectamos cuanto hay que leer y si estamos en el ultimo bloque
+        if(cursor+seed<length){howMany=seed;}
+            else{howMany=length-cursor;last=1;}
 
         ifs.read(buffer,howMany);
 
-        if (cipher==1)
-        {
-            if(way==0)//first block too since way is initialized in 0
+        /*Segun el metodo, descodificamos*/
+            if (method==1)
+            {
+                if(rule==0)
+                {
+                    for(int i=0;i<howMany;i++)
+                    {
+                        mfs<<notbin(buffer[i]);
+                        //invertimos todos
+                    }
+                }
+
+                if(rule>0)
+                {
+                    for(int i=0;i<howMany;i++)
+                    {
+                        if(i%2!=0){mfs<<notbin(buffer[i]);}
+                        else{mfs<<buffer[i];}
+                        //invertimos cada dos
+                    }
+                }
+
+                if(rule<0)
+                {
+                    for(int i=0;i<howMany;i++)
+                    {
+                        if((i+1)%3==0){mfs<<notbin(buffer[i]);}
+                        else{mfs<<buffer[i];}
+                        //invertimos cada 3
+
+                    }
+                }
+
+                /*Para debug*/
+                    //line
+                    //std::cout<<mfs.good()<<" "<<mfs.tellp()<<mfs.tellg();
+                    //line
+
+                /*Correcion del seek del stream mfs*/
+
+                /*
+                Cada vez que usamos mfs<< el cursor howMany posiciones y nuestra meta es leer lo que acabamos de descodificar para determinar que regla usar
+                Por lo tanto restamos al cursor howMany posiciones
+                */
+                mfs.seekg(-howMany,mfs.cur);
+                mfs.read(buffer2,howMany);
+
+                /*Determinamos que regla se aplica en el siguiente bloque*/
+                int z=0;
+                int o=0;
+                for(int i=0;i<howMany;i++)
+                {
+                    if (buffer2[i]=='0'){z++;}
+                    if (buffer2[i]=='1'){o++;}
+                }
+                rule=z-o;
+
+            }
+
+            if (method==2)
             {
                 for(int i=0;i<howMany;i++)
                 {
-                    ofs<<notbin(buffer[i]);
+                    /*El primero del buffer (codificado) es el ultimo descodificado*/
+                    if(i==howMany-1){mfs<<buffer[0];}
+                    /*En los demas el siguiente del buffer (codificado) es el actual descodificado*/
+                    else {mfs<<buffer[i+1];}
                 }
             }
 
-            if(way>0)
-            {
-                for(int i=0;i<howMany;i++)
-                {
-                    if(i%2==0){ofs<<buffer[i];}
-                    else{ofs<<notbin(buffer[i]);}
-                }
-            }
+        if(last){break;}//ultimo bloque
 
-            if(way<0)
-            {
-                for(int i=0;i<howMany;i++)
-                {
-                    if((i+1)%3==0){ofs<<notbin(buffer[i]);}
-                    else{ofs<<buffer[i];}
-
-                }
-            }
-            //line
-            //std::cout<<ofs.good()<<" "<<ofs.tellp()<<ofs.tellg();
-            //line
-            ofs.seekg(-4,ofs.cur);//this was the problem, everytime we did ofs<< the carry moved
-            ofs.read(buffer2,howMany);
-
-            int z=0;
-            int o=0;
-            for(int i=0;i<howMany;i++)
-            {
-                if (buffer2[i]=='0'){z++;}
-                if (buffer2[i]=='1'){o++;}
-            }
-            way=z-o;
-        }
-
-        if (cipher==2)
-        {
-            for(int i=0;i<howMany;i++)
-            {
-                if(i==howMany-1){ofs<<buffer[0];}
-                else {ofs<<buffer[i+1];}
-            }
-        }
-        if(howMany<seed){break;}//last block
+        if(!ifs.good()){throw '1';}
+        if(!mfs.good()){throw '2';}
      }
 
 /*Conversion from binary to text*/
-    ofs.seekg(0,ofs.beg);
+    mfs.seekg(0,mfs.beg);
+
+    //creamos un buffer para el archivo de texto descodificado
     char buffet[8]; //1 byte is 8 bits, therefore 8 chars in binary are 1 char in text
-    ofs.read(buffet,8);
-    while(ofs.good()&&text.good())
-    {
+    mfs.read(buffet,8); //leemos los primeros 8 caracteres (que representan bits)
 
-        int x=0;
-        for(int i=0;i<8;i++)
-        {
-            x=((int) (buffet[i]-48))*pow(2,7-i)+x;
-
-            //line
-        }
-        //std::cout<<x;
-
-        text<<(char) x;
+    while(1)
+    {       
+        text<<binaryToChar(8,buffet);
         //line
-        //std::cout<<ofs.eof();line
-        ofs.read(buffet,8);
-        if(ofs.eof()){break;}
+        //std::cout<<mfs.eof();line
 
+        mfs.read(buffet,8);//leemos los siguientes 8 bits para la siguiente iteracion
+        //de esta manera si ya estabamos en los ultimos 8 entonces al movernos llegaremos a eof y podremos salir
+        if(mfs.eof()){break;}
+
+        if(!mfs.good()){throw '2';}
+        if(!text.good()){throw '3';}
     }
 
+
+    /*Cerramos los archivos*/
     ifs.close();
-    ofs.close();
+    mfs.close();
     text.close();
+
+    //Eliminamos el archivo extra binario sin codificar
+    int removed = remove(filebin);//remove retorna 0 si se borro correctamente y otro numero si no
+    if(removed){throw '4';}
+
+    line
+    std::cout<<"Archivo desencriptado exitosamente!";
+    line
+
+
+}//cierre del try
+
+    /*Excepciones*/
+        catch (char c){
+                std::cout<<"Error # "<<c<<": ";
+                if(c=='1'){std::cout<<"Error al abrir el archivo de entrada.\n";}
+                if(c=='2'){std::cout<<"Error al generar archivo de texto binario intermedio no encriptado.\n";}
+                if(c=='3'){std::cout<<"Error al generar archivo de texto decodificado.\n";}
+                if(c=='4'){std::cout<<"Error al eliminar el archivo de texto binario no encriptado.\n";}
+                }
+
+        catch(...){ //cualquier otra excepcion
+            std::cout << "Error desconocido." <<std::endl;
+        }
+
     return 0;
 }
-
-//std::bitset<8> binary(char c)
-//{
-//    std::bitset<8> x(c);
-//    return x;
-//}
-
-char notbin(char c)
-{
-    char xnot;
-    if (c=='0'){xnot='1';}
-    if (c=='1'){xnot='0';}
-
-    return xnot;
-}
-
-int pow(int a,int b)
-    {
-        int potencia=a;
-        if (b==0){return 1;}
-        else
-        {
-        for(int i=1;i<b;i++)
-            {
-                    potencia=potencia*a;
-            }
-        return potencia;
-        }
-    }
