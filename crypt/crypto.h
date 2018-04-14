@@ -16,6 +16,7 @@ void textToBinary (std::fstream * ifs , std::fstream * ofsb);
 void encrypt(std::fstream * ofsb, std::fstream * ofsc,int seed ,int method );
 void decrypt(std::fstream * ifs, std::fstream * mfs, int seed , int method );
 void binaryToText(std::fstream * mfs, std::fstream * text);
+void viewFile(std::fstream * ifs);
 //std::bitset<8> binary(char ) implementacion vieja de la conversion a binario
 
 #endif

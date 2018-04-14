@@ -452,3 +452,15 @@ void binaryToText(std::fstream * mfs, std::fstream * text)
             std::cout << "Error desconocido." <<std::endl;
         }
 }
+
+void viewFile(std::fstream * ifs)
+{
+    std::cout <<"\n\n\n";
+    char c;
+    while(1)
+    {
+        ifs->get(c);
+        if(ifs->eof()){std::cout <<"\n\n\n";break;}
+        std::cout << c;
+    }
+}
