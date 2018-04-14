@@ -14,7 +14,7 @@ void loop()
     if(ByteLlegando == 'k')
     {
       digitalWrite(13, HIGH);
-      Serial.print("Descomponerte,Descomponerte.\nDesentrelazarte el alma.\nDesvestirte hasta el pasado.\nDesvestirte hasta los sueños.\nMorir en tu pecho.\nTransformarte en lagrima.\nDevolverte al cielo.\nDonde perteneces.\nConvertirte en sueño.\nDevorarte el alma."); // wait for a second
+      Serial.print("mensaje"); // wait for a second
       delay(1000);
       //Serial.print("k");
       digitalWrite(13, LOW);
