@@ -9,7 +9,6 @@
 #include "crypto.h"
 
 #define line std::cout<<std::endl;
-#define word 8
 #define max_filename 100
 #define max_msg 1024
 #define start_flag 'k'
@@ -256,45 +255,37 @@ int compare()
     std::fstream ifs1(file1,std::ifstream::in);
     std::fstream ifs2(file2,std::ifstream::in);
 
-    char buffer1[word];
-    char buffer2[word];
-
-    ifs1.seekg(0,ifs1.end);
-    int length=ifs1.tellg();
-    ifs1.seekg(0,ifs1.beg);
-
-
-
-
-
-    std::cout<<ifs1.good()<<" "<<ifs2.good()<<std::endl;
-    while(ifs1.good()&&ifs2.good())
+    int opc=0;
+    while(opc!=1&&opc!=2)
     {
-        int carry=ifs1.tellg();
-        int howMany;
-        if(carry+word<=length){howMany=word;}
-            else{howMany=length-carry;}
-
-        ifs1.read(buffer1,howMany);
-        ifs2.read(buffer2,howMany);
-
-
-        bool equal=true;
-
-        for(int i=0;i<howMany;i++)
+    std::cout<<"\nIngrese que metodo desea usar para la comparacion:\n";
+    std::cout<<"1.En bloques de n caracteres\n2.Palabra por palabra.\n";
+    std::cin>>opc;
+    }
+    if (opc==1)
+    {
+        int n=0;
+        while(1)
         {
-            if(buffer1[i]!=buffer2[i])
-            {
-                equal=false;
-            }
+            std::cout<<"Ingrese el tamanyo del bloque (entero mayor que cero)\n";
+            std::cin>>n;
+            if(n>0){break;}
         }
-        printstr(buffer1,howMany);
-        std::cout<<" == ";
-        printstr(buffer2,howMany);
-        std::cout<<" : "<<equal<<std::endl;
 
-        if(howMany<word){break;}//last block
+        compare_fixed(&ifs1,&ifs2,n);
+    }
 
+    if(opc==2)
+    {
+        int m=0;
+        while(1)
+        {
+            std::cout<<"Ingrese el tamanyo de la palabra mas grande (entero mayor que cero)\n";
+            std::cin>>m;
+            if(m>0){break;}
+        }
+
+    compare_word(&ifs1,&ifs2,m);
     }
 
     return 0;

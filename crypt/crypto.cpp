@@ -464,3 +464,156 @@ void viewFile(std::fstream * ifs)
         std::cout << c;
     }
 }
+
+/*Funcion que compara dos streams en bloques de tamanyo 'word' definido por el usuario*/
+void compare_fixed(std::fstream * ifs1,std::fstream * ifs2,int word)
+{
+    //buffers de los streams
+    char * buffer1;
+    char * buffer2;
+
+    buffer1= new char[word];
+    buffer2= new char[word];
+
+    //obtenemos tamanyo del archivo 1
+    ifs1->seekg(0,ifs1->end);
+    int length1=ifs1->tellg();
+    ifs1->seekg(0,ifs1->beg);
+
+    //obtenemos tamanyo del archivo 1
+    ifs2->seekg(0,ifs2->end);
+    int length2=ifs2->tellg();
+    ifs2->seekg(0,ifs2->beg);
+
+
+
+    while(ifs1->good()&&ifs2->good())
+    {
+        //determinamos cuanto podemos leer del archivo 1
+        int carry1=ifs1->tellg();
+        int howMany1;
+        if(carry1+word<=length1){howMany1=word;}
+            else{howMany1=length1-carry1;}
+
+        //determinamos cuanto podemos leer del archivo 2
+        int carry2=ifs2->tellg();
+        int howMany2;
+        if(carry2+word<=length2){howMany2=word;}
+            else{howMany2=length2-carry2;}
+
+        //lectura de los archivos en sus respectivos buffers
+        ifs1->read(buffer1,howMany1);
+        ifs2->read(buffer2,howMany2);
+
+
+        //comparacion
+        bool equal=true;//empezamos suponiendo que son iguales
+
+        if(howMany1!=howMany2){equal=false;}//si los tamanyos son diferentes ya sabemos que son distintos
+        else
+        {
+            //si los tamanyos son iguales verificamos caracter a caracter
+            for(int i=0;i<howMany1;i++)
+            {
+                if(buffer1[i]!=buffer2[i])
+                {
+                    equal=false;
+                }
+            }
+        }
+
+        //impresion de los resultados
+
+        printstr(buffer1,howMany1);
+        std::cout<<" == ";
+        printstr(buffer2,howMany2);
+        std::cout<<" : "<<equal<<std::endl;
+
+        //salimos del ciclo si estamos en el ultimo bloque
+        if(howMany1<word||howMany2<word){break;}//last block
+
+    }
+
+}
+
+/*Funcion que compara dos archivos palabra a palabra.
+ * Note que si los dos archivos tienen las mismas palabras pero diferentes espacios o saltos de linea
+ * se veran como iguales en la funcion
+*/
+void compare_word(std::fstream * ifs1,std::fstream * ifs2, int max_word)
+{
+
+    line line
+
+    //creacion de los buffers para los archivos
+    char * buffer1;
+    char * buffer2;
+
+    //sumamos 1 al tamanyo para incluir a final el fin de string (\0)
+    buffer1= new char[max_word+1];
+    buffer2= new char[max_word+1];
+
+    //caracteres auxiliares que permiten verificar si llegamos a un espacio o salto de linea
+    char a,b;
+
+    while(1)
+    {
+        //contadores para controlar en que posicion del buffer colocamos el caracter actual
+        int i,j;
+        i=0;j=0; //i para buffer 1 , j para buffer 2
+
+        while(1)
+        {
+            a = ifs1->peek();//guardamos el siguiente caracter en a
+            //std::cout<<a;
+            //si el siguiente caracter es espacio, salto de linea o el fin del archivo entonces salimos del ciclo
+            if(a == ' '  || a == '\n'||ifs1->eof()){ifs1->get();break;}
+            ifs1->get(buffer1[i]);// de lo contrario estamos dentro de una palabra, guardamos el caracter en el buffer
+            i++;
+        }
+
+        buffer1[i]='\0';//cuando ya salimos de la colocamos un \0 para no tener errores en la impresion
+
+        //similarmente para el archivo 2
+        while(1)
+        {
+            b = ifs2->peek();
+            //std::cout<<b;
+            if(b == ' ' || b== '\n'||ifs2->eof()){ifs2->get();break;}
+            ifs2->get(buffer2[j]);
+            j++;
+        }
+
+        buffer2[j]='\0';
+
+        //comparamos las palabras
+
+        bool equal=true;//empezamos suponiendo que son iguales
+        int m=0;
+
+        //recorremos las palabras obtenidas en el buffer, comparando caracter a caracter
+        while(1)
+        {
+            if(buffer1[m]!=buffer2[m])
+            {
+                equal=false;
+            }
+
+            //si hemos llegado al fin de alguna de las palabras o de alguno de los archivos nos salimos del ciclo
+            if(buffer1[m]=='\0' || buffer1[m]=='\0'||ifs1->eof()||ifs2->eof()){break;}
+            m++;
+
+        }
+
+        //impresion de los resultados
+
+        std::cout<<buffer1<<"=="<<buffer2<<":"<<equal;
+        line
+
+        //si llegamos al fin de alguno de los archivos nos salimos
+        if(ifs1->eof()||ifs2->eof()){break;}
+
+    }
+
+
+}

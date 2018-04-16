@@ -17,6 +17,8 @@ void encrypt(std::fstream * ofsb, std::fstream * ofsc,int seed ,int method );
 void decrypt(std::fstream * ifs, std::fstream * mfs, int seed , int method );
 void binaryToText(std::fstream * mfs, std::fstream * text);
 void viewFile(std::fstream * ifs);
+void compare_fixed(std::fstream * ifs1,std::fstream * ifs2,int word);
+void compare_word(std::fstream * ifs1,std::fstream * ifs2, int max_word);
 //std::bitset<8> binary(char ) implementacion vieja de la conversion a binario
 
 #endif
