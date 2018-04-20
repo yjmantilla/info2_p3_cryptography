@@ -19,6 +19,8 @@ void binaryToText(std::fstream * mfs, std::fstream * text);
 void viewFile(std::fstream * ifs);
 void compare_fixed(std::fstream * ifs1,std::fstream * ifs2,int word);
 void compare_word(std::fstream * ifs1,std::fstream * ifs2, int max_word);
+void countWordsBiggerThan(std::fstream * ifs, int big, int max_word, int & totalCount, int & bigCount, int &  smallCount);
+int str_size(char * str);
 //std::bitset<8> binary(char ) implementacion vieja de la conversion a binario
 
 #endif

@@ -24,6 +24,7 @@ int toBinary();
 int toText();
 int decode_arduino(char * arduino_file);
 int printFile();
+int count();
 
 int main()
 {
@@ -43,11 +44,12 @@ int main()
             std::cout<<"6.Convertir a Binario\n";
             std::cout<<"7.Convertir a Texto\n";
             std::cout<<"8.Visualizar Archivo de Texto\n";
+            std::cout<<"9.Contar Palabras\n";
             std::cout<<"0.Salir\n";
             line line
             std::cin>>opc;
             line
-            if(opc==0||opc==1||opc==2||opc==3||opc==4||opc==5||opc==6||opc==7||opc==8){break;}
+            if(opc==0||opc==1||opc==2||opc==3||opc==4||opc==5||opc==6||opc==7||opc==8||opc==9){break;}
         }
 
         switch (opc)
@@ -61,6 +63,7 @@ int main()
         case 6 :{toBinary();break;}
         case 7 :{toText();break;}
         case 8 :{printFile(); break;}
+        case 9 :{count();break;}
         }
     }
     return 0;
@@ -710,5 +713,39 @@ int printFile()
 
     ifs.close();
     return 0;
+
+}
+
+int count()
+{
+    char file[max_filename];
+
+    //while(1)
+    {
+    line
+    std::cout<<"Ingrese el nombre del archivo:\n";
+    std::cin>>file;
+    line
+
+    }
+    std::fstream ifs(file,std::ifstream::in);
+    if(!ifs.good()){std::cout<<"\nNo se encontro el archivo.\n";return -1;}
+
+    int big=0;
+    while(1)
+    {
+        std::cout<<"\nIntroduzca el tamanyo de las palabras minimo de las palabras que desea contar: \n";
+        std::cin>>big;
+        if(big>0){break;}
+    }
+
+    int totalCount,bigCount,smallCount;
+    countWordsBiggerThan(&ifs,big-1,max_filename,totalCount,bigCount,smallCount);
+    ifs.close();
+
+    std::cout<<"\nHay en total "<<totalCount<<" palabras.\n"<<bigCount<<" son de longitud minima de "<<big<<".\n"<<smallCount<<" son menores.\n";
+
+    return 0;
+
 
 }

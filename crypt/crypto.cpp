@@ -617,3 +617,56 @@ void compare_word(std::fstream * ifs1,std::fstream * ifs2, int max_word)
 
 
 }
+
+
+int str_size(char * str)
+{
+    int i = 0;
+    while(1)
+    {
+            if(str[i] == '\0'){break;}
+            i++;
+    }
+    return i;
+}
+
+void countWordsBiggerThan(std::fstream * ifs, int big, int max_word, int & totalCount, int & bigCount, int &  smallCount)
+{
+    char * buffer;
+    buffer = new char[max_word+1];
+    totalCount = 0;
+    bigCount = 0;
+    smallCount = 0;
+
+    char a;
+    line
+    std::cout<<"Palabras de longitud minima "<< big+1<<" :"<<std::endl;
+
+while(1)
+{
+    int i = 0;
+    while(1)
+    {
+        a = ifs->peek();//guardamos el siguiente caracter en a
+        //std::cout<<a;
+        //si el siguiente caracter es espacio, salto de linea o el fin del archivo entonces salimos del ciclo
+        if(a == ' '  || a == '\n'||ifs->eof()){ifs->get();break;}
+        ifs->get(buffer[i]);// de lo contrario estamos dentro de una palabra, guardamos el caracter en el buffer
+        i++;
+    }
+
+    buffer[i]='\0';//cuando ya salimos de la colocamos un \0 para no tener errores en la impresion
+
+    if(str_size(buffer)>big){bigCount++; std::cout<<"\n"<<buffer<<"\n";}
+    else{smallCount++;}
+
+    totalCount++;
+
+    //std::cout<<"\n"<<totalCount<<" = "<<bigCount<<" + " << smallCount<<"\n";
+
+    if(ifs->eof()){break;}
+
+}
+
+}
+
