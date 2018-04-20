@@ -14,7 +14,7 @@ void loop()
     if(ByteLlegando == 'k')
     {
       digitalWrite(13, HIGH);
-      Serial.print("mensaje"); // wait for a second
+      Serial.print("00101000001100010010100100110010"); // wait for a second
       delay(1000);
       Serial.print("k");
       digitalWrite(13, LOW);
