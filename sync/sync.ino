@@ -5,18 +5,19 @@ void setup() {
   digitalWrite(13, LOW);
 }
 
+char msg[] = "que es lo que es vladimir?";
 // the loop function runs over and over again forever
 void loop() 
 {
   if(Serial.available()>0)
   {
     char ByteLlegando = Serial.read(); 
-    if(ByteLlegando == 'k')
+    if(ByteLlegando == '{')
     {
       digitalWrite(13, HIGH);
-      Serial.print("00101000001100010010100100110010"); // wait for a second
+      Serial.print(msg); // wait for a second
       delay(1000);
-      //Serial.print("k");
+      //Serial.print("}");
       digitalWrite(13, LOW);
     }
   }

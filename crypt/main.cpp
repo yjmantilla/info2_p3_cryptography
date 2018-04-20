@@ -11,15 +11,15 @@
 #define line std::cout<<std::endl;
 #define max_filename 100
 #define max_msg 1024
-#define start_flag 'k'
-#define stop_flag 'k'
+#define start_flag '{'
+#define stop_flag '}'
 
 int encrypt();
 int decrypt();
 int compare();
 int sync();
 int async();
-void port_cfg(QSerialPort * serial, char * port);
+bool port_cfg(QSerialPort * serial, char * port);
 int toBinary();
 int toText();
 int decode_arduino(char * arduino_file);
@@ -300,7 +300,14 @@ int sync()
     char port[max_filename];
 
     QSerialPort serial;
-    port_cfg(&serial,port);
+
+    bool open = port_cfg(&serial,port);
+
+    std::cout<<std::endl<<open<<std::endl;
+
+    //Chequeamos si el puerto se abrio correctamente
+    if (!open){return -1;}
+
 
     /*Configuracion del mensaje*/
 //    int length=0; //tamanyo del bloque de lectura maximo
@@ -375,11 +382,13 @@ int async()
     char port[max_filename];
 
     QSerialPort serial;
-    port_cfg(&serial,port);
 
-    //int read=1;
-    char * data;
-    data = new char[max_msg];
+    bool open = port_cfg(&serial,port);
+
+    std::cout<<std::endl<<open<<std::endl;
+
+    //Chequeamos si el puerto se abrio correctamente
+    if (!open){return -1;}
 
     /*Archivo donde se va a guardar*/
     char file[max_filename];
@@ -391,34 +400,33 @@ int async()
     //arduino file stream
     std::fstream afs(file,std::ifstream::out| std::fstream::trunc);
 
-    int howMany = 0;
-
-    serial.putChar(start_flag);
+    char c;
+    bool read = false;
     while(true)
     {
         if(serial.waitForReadyRead(-1))
         {
+            serial.read(&c,1);
+            qDebug()<<"Response: "<<c;
             //data was returned
-            howMany=serial.readLine(data,max_msg);
+            if(c == start_flag)
+                {
+                    read = !read;
+                    continue;
+                }
 
-            qDebug()<<"Response: "<<data;
+            if(c == stop_flag){break;}
 
+            if(read){afs.put(c);}
 
+         }
 
-            if(data[howMany-1] == stop_flag) {break;}//fin de la transmision
-
-            afs.write(data,howMany);
-
-            //break;
-
-        }
         else{
                         //No data
                         qDebug()<<"Time out";
                     }
 
     }
-
     serial.close();
     afs.close();
 
@@ -437,7 +445,7 @@ int async()
 
 }
 
-void port_cfg(QSerialPort * serial, char * port)
+bool port_cfg(QSerialPort * serial, char * port)
 {
     /*Configuracion del puerto*/
 
@@ -449,10 +457,11 @@ void port_cfg(QSerialPort * serial, char * port)
         line
 
         serial->setPortName(port);
+        //std::cout<<std::endl<<serial->open(QIODevice::ReadWrite)<<std::endl;
 
-        if(!serial->open(QIODevice::ReadWrite)) {throw '0';}
-
-        if(serial->open(QIODevice::ReadWrite)) {
+        //if(!serial->open(QIODevice::ReadWrite)) {throw '0';}
+        bool open = serial->open(QIODevice::ReadWrite);
+        if(open) {
 
 
             if(!serial->setBaudRate(QSerialPort::Baud9600))
@@ -469,24 +478,27 @@ void port_cfg(QSerialPort * serial, char * port)
 
             if(!serial->setFlowControl(QSerialPort::NoFlowControl))
             {qDebug()<<serial->errorString();throw '5';}
-        }
 
+            return true;
+
+        }
+        else {throw '0';}
 
     }
 
     /*Excepciones*/
         catch (char c){
                 std::cout<<"Error # "<<c<<": ";
-                if(c=='0'){std::cout<<"Error al abrir puerto.\n";}
-                if(c=='1'){std::cout<<"Error al configurar baudios.\n";}
-                if(c=='2'){std::cout<<"Error al configurar cantidad data bits.\n";}
-                if(c=='3'){std::cout<<"Error al configurar paridad del puerto.\n";}
-                if(c=='4'){std::cout<<"Error al configurar bits de stop.\n";}
-                if(c=='5'){std::cout<<"Error al configurar flow control.\n";}
+                if(c=='0'){std::cout<<"Error al abrir puerto.\n";return false;}
+                if(c=='1'){std::cout<<"Error al configurar baudios.\n";return false;}
+                if(c=='2'){std::cout<<"Error al configurar cantidad data bits.\n";return false;}
+                if(c=='3'){std::cout<<"Error al configurar paridad del puerto.\n";return false;}
+                if(c=='4'){std::cout<<"Error al configurar bits de stop.\n";return false;}
+                if(c=='5'){std::cout<<"Error al configurar flow control.\n";return false;}
                 }
 
         catch(...){ //cualquier otra excepcion
-            std::cout << "Error desconocido." <<std::endl;
+            std::cout << "Error desconocido." <<std::endl;return false;
         }
 
 }
