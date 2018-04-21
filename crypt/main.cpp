@@ -338,14 +338,14 @@ int sync()
 
 
 
-        serial.waitForReadyRead(100);
+        serial.waitForReadyRead(25);
         while(serial.bytesAvailable()>0)
         {
             if(serial.bytesAvailable()>0)
             {
                 //Data was returned
                  howMany= serial.readLine(message,max_msg); //Leer toda la línea que envía arduino, - 1 porque al final agrega \0 automaticamente
-                qDebug()<<"Response: "<<message;
+                qDebug()<<"Response: '"<<message<<"'";
 
                 /*Guardamos en el archivo*/
                 afs.write(message,howMany);
@@ -356,7 +356,7 @@ int sync()
                 //No data
                 qDebug()<<"Time out";
             }
-            serial.waitForReadyRead(100);
+            serial.waitForReadyRead(25);
         }
 
 
@@ -404,19 +404,24 @@ int async()
     bool read = false;
     while(true)
     {
-        if(serial.waitForReadyRead(-1))
+        if(serial.waitForReadyRead(25))
         {
             serial.read(&c,1);
-            qDebug()<<"Response: "<<c;
-            //data was returned
-            if(c == start_flag)
+
+
+            if(!read && c == start_flag)
                 {
                     read = !read;
+                    qDebug()<<"\n######START######\n";
                     continue;
                 }
 
-            if(c == stop_flag){break;}
+            if(read && c == stop_flag){qDebug()<<"\n######STOP######\n";break;}
 
+
+
+            //data was returned
+            qDebug()<<"Response: "<<c;//<< " - read :"<<read;
             if(read){afs.put(c);}
 
          }
